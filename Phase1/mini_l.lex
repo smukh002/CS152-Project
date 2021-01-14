@@ -9,8 +9,7 @@ Example: compile your lexical analyzer into the executable lexer with the follow
 
 %{
    int currentLine = 1;
-   int currentPosition = 1;
-   
+   int currentPosition = 1; 
 %}
 
 NUMBER         [0-9]
