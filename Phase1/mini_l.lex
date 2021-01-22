@@ -16,7 +16,11 @@ NUMBER         [0-9]
 ALPHA          [A-Z|a-z]
 ALPHANUMERIC   [a-z|A-Z|0-9]
 VALID          {ALPHANUMERIC}|_
-
+COMMENT        ##.*
+IDENT_DIG      {NUMBER}*
+IDENT_START_ERR ({NUMBER}|[_])({ALPHA}|{NUMBER}|[_])*(({ALPHA}|{NUMBER})+)*
+IDENT_END_ERR   {ALPHA}({ALPHA}|{NUMBER}|[_])*([_])+
+IDENT_SYMBL_ERR {ALPHA}({ALPHA}|{NUMBER}|[_])*(({ALPHA}|{NUMBER})+)*
 %%
 
 "function"     { currentPosition += yyleng; return FUNCTION;         } 
@@ -68,3 +72,14 @@ VALID          {ALPHANUMERIC}|_
 "["            { currentPosition += yyleng; return L_SQUARE_BRACKET; }
 "]"            { currentPosition += yyleng; return R_SQUARE_BRACKET; }
 ":="           { currentPosition += yyleng; return ASSIGN;           }
+{COMMENT}
+{IDENT_DIG}   printf("NUMBER %s\n",yytext);currentPosition += yyleng; 
+{IDENT_START_ERR} {printf("Error at line %d, column %d: Identifier \"%s\" must begin with a letter\n",currentLine,currentPosition,yytext);exit(0);}
+{IDENT_END_ERR} {printf("Error at line %d, column %d: Identifier \"%s\" cannot end with an underscore\n",currentLine,currentPosition,yytext);exit(0);}
+{IDENT_SYMBL_ERR} {printf("IDENT %s\n",yytext);currentPosition += yyleng; printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n", currentLine,currentPosition,yytext);exit(0);}
+.
+%%
+ int main(int argc, char **argv)
+{
+yylex();
+}
