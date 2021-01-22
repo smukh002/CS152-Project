@@ -79,9 +79,9 @@ return		{printf("RETURN\n"); currentPosition += yyleng;}
 
 {IDENTIFIERS}		{printf("IDENT %s\n", yytext); currentPosition += yyleng;}
 
-{BEGIN_ERROR}      	{printf("Error at line %d, currentPosition %d: Identifier \"%s\" must begin with a letter\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
+{BEGIN_ERROR}      	{printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
 
-{END_ERROR}              {printf("Error at line %d, currentPosition %d: Identifier \"%s\" cannot end with an underscore\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
+{END_ERROR}              {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
 
 		/*for ignoring whitespaces*/
 [ \t]		{currentPosition += yyleng;} 
@@ -91,7 +91,7 @@ return		{printf("RETURN\n"); currentPosition += yyleng;}
 {COMMENTS}	{currentPosition += yyleng;} 
 
 		/*unrecognized symbols*/
-.		{printf("Error at line %d, currentPosition %d :unrecognized symbol \"%s\"\n",currentLine,currentPosition,yytext);exit(0);}
+.		{printf("Error at line %d, column %d :unrecognized symbol \"%s\"\n",currentLine,currentPosition,yytext);exit(0);}
 %%
 
 

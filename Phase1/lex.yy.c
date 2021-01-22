@@ -1097,12 +1097,12 @@ YY_RULE_SETUP
 case 49:
 YY_RULE_SETUP
 #line 82 "mini_l.lex"
-{printf("Error at line %d, currentPosition %d: Identifier \"%s\" must begin with a letter\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
+{printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 84 "mini_l.lex"
-{printf("Error at line %d, currentPosition %d: Identifier \"%s\" cannot end with an underscore\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
+{printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
 	YY_BREAK
 /*for ignoring whitespaces*/
 case 51:
@@ -1127,7 +1127,7 @@ YY_RULE_SETUP
 case 54:
 YY_RULE_SETUP
 #line 94 "mini_l.lex"
-{printf("Error at line %d, currentPosition %d :unrecognized symbol \"%s\"\n",currentLine,currentPosition,yytext);exit(0);}
+{printf("Error at line %d, column %d :unrecognized symbol \"%s\"\n",currentLine,currentPosition,yytext);exit(0);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
