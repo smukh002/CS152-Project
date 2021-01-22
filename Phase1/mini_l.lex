@@ -1,4 +1,5 @@
-/* 1. Write the specification for a flex lexical analyzer for the MINI-L language. For this phase of the project, your lexical analyzer need only output the list of tokens identified from an inputted MINI-L program.
+/* 
+1. Write the specification for a flex lexical analyzer for the MINI-L language. For this phase of the project, your lexical analyzer need only output the list of tokens identified from an inputted MINI-L program.
 Example: write the flex specification in a file named mini_l.lex.
 2. Run flex to generate the lexical analyzer for MINI-L using your specification.
 Example: execute the command flex mini_l.lex. This will create a file called lex.yy.c in the current directory.
@@ -7,79 +8,101 @@ Example: compile your lexical analyzer into the executable lexer with the follow
 */
 
 
+/*definitions/global variable declarations*/
 %{
-   int currentLine = 1;
-   int currentPosition = 1; 
+   int currentLine = 1; int currentPosition = 1;
 %}
 
-NUMBER         [0-9]
-ALPHA          [A-Z|a-z]
-ALPHANUMERIC   [a-z|A-Z|0-9]
-VALID          {ALPHANUMERIC}|_
-COMMENT        ##.*
-IDENT_DIG      {NUMBER}*
-IDENT_START_ERR ({NUMBER}|[_])({ALPHA}|{NUMBER}|[_])*(({ALPHA}|{NUMBER})+)*
-IDENT_END_ERR   {ALPHA}({ALPHA}|{NUMBER}|[_])*([_])+
-IDENT_SYMBL_ERR {ALPHA}({ALPHA}|{NUMBER}|[_])*(({ALPHA}|{NUMBER})+)*
+
+/*rules for regex*/
+LETTERS      	[a-zA-Z]
+DIGITS       	[0-9]
+IDENTIFIERS	({LETTERS}({LETTERS}|{DIGITS}|"_")*({LETTERS}|{DIGITS}))|{LETTERS}
+BEGIN_ERROR	[0-9_]+{IDENTIFIERS}
+END_ERROR	{IDENTIFIERS}[_]+	
+COMMENTS	[#][#].*
+
+%%
+		/*reserved words*/
+function	{printf("FUNCTION\n");currentPosition += yyleng;}
+beginparams	{printf("BEGIN_PARAMS\n");currentPosition += yyleng;}
+endparams	{printf("END_PARAMS\n");currentPosition += yyleng;}
+beginlocals	{printf("BEGIN_LOCALS\n");currentPosition += yyleng;}
+endlocals	{printf("END_LOCALS\n");currentPosition += yyleng;}
+beginbody	{printf("BEGIN_BODY\n");currentPosition += yyleng;}
+endbody		{printf("END_BODY\n");currentPosition += yyleng;}
+integer		{printf("INTEGER\n");currentPosition += yyleng;}
+array		{printf("ARRAY\n");currentPosition += yyleng;}
+of		{printf("OF\n");currentPosition += yyleng;}
+if		{printf("IF\n");currentPosition += yyleng;}
+then		{printf("THEN\n");currentPosition += yyleng;}
+endif		{printf("ENDIF\n");currentPosition += yyleng;}
+else		{printf("ELSE\n");currentPosition += yyleng;}
+while		{printf("WHILE\n");currentPosition += yyleng;}
+do		{printf("DO\n");currentPosition += yyleng;}
+beginloop	{printf("BEGINLOOP\n");currentPosition += yyleng;}
+endloop		{printf("ENDLOOP\n");currentPosition += yyleng;}
+continue	{printf("CONTINUE\n");currentPosition += yyleng;}
+read		{printf("READ\n");currentPosition += yyleng;}
+write		{printf("WRITE\n");currentPosition += yyleng;}
+and		{printf("AND\n");currentPosition += yyleng;}
+or		{printf("OR\n");currentPosition += yyleng;}
+not		{printf("NOT\n");currentPosition += yyleng;}
+true		{printf("TRUE\n");currentPosition += yyleng;}
+false		{printf("FALSE\n");currentPosition += yyleng;}
+return		{printf("RETURN\n"); currentPosition += yyleng;}
+		/*arithmetic operators*/
+"-"		{printf("SUB\n"); currentPosition += yyleng;}
+"+"		{printf("ADD\n"); currentPosition += yyleng;}
+"*"		{printf("MULT\n"); currentPosition += yyleng;}
+"/"		{printf("DIV\n"); currentPosition += yyleng;}
+"%"		{printf("MOD\n"); currentPosition += yyleng;}
+		/*comparison operators*/
+"=="		{printf("EQ\n"); currentPosition += yyleng;}
+"<>"		{printf("NEQ\n"); currentPosition += yyleng;}
+"<"		{printf("LT\n"); currentPosition += yyleng;}
+">"		{printf("GT\n"); currentPosition += yyleng;}
+"<="		{printf("LTE\n"); currentPosition += yyleng;}
+">="		{printf("GTE\n"); currentPosition += yyleng;}
+		/*other special symbols*/
+";"		{printf("SEMICOLON\n"); currentPosition += yyleng;}
+":"		{printf("COLON\n"); currentPosition += yyleng;}
+","		{printf("COMMA\n"); currentPosition += yyleng;}
+"("		{printf("L_PAREN\n"); currentPosition += yyleng;}
+")"		{printf("R_PAREN\n"); currentPosition += yyleng;}
+"["		{printf("L_SQUARE_BRACKET\n"); currentPosition += yyleng;}
+"]"		{printf("R_SQUARE_BRACKET\n"); currentPosition += yyleng;}
+":="		{printf("ASSIGN\n"); currentPosition += yyleng;}  
+
+			/*identifiers and numbers*/
+{DIGITS}+		{printf("NUMBER %s\n",yytext);currentPosition += yyleng;}
+
+{IDENTIFIERS}		{printf("IDENT %s\n", yytext); currentPosition += yyleng;}
+
+{BEGIN_ERROR}      	{printf("Error at line %d, currentPosition %d: Identifier \"%s\" must begin with a letter\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
+
+{END_ERROR}              {printf("Error at line %d, currentPosition %d: Identifier \"%s\" cannot end with an underscore\n",currentLine,currentPosition,yytext);currentPosition += yyleng;exit(0);} 
+
+		/*for ignoring whitespaces*/
+[ \t]		{currentPosition += yyleng;} 
+		/*for ignoring newlines*/	
+[\n]		{currentLine = currentLine + 1; currentPosition = 1;} 
+		/*for ignoring comments*/	
+{COMMENTS}	{currentPosition += yyleng;} 
+
+		/*unrecognized symbols*/
+.		{printf("Error at line %d, currentPosition %d :unrecognized symbol \"%s\"\n",currentLine,currentPosition,yytext);exit(0);}
 %%
 
-"function"     { currentPosition += yyleng; return FUNCTION;         } 
-"beginparams"  { currentPosition += yyleng; return BEGIN_PARAMS;     }
-"endparams"    { currentPosition += yyleng; return END_PARAMS;       }
-"beginlocals"  { currentPosition += yyleng; return BEGIN_LOCALS;     }
-"endlocals"    { currentPosition += yyleng; return END_LOCALS;       }
-"beginbody"    { currentPosition += yyleng; return BEGIN_BODY;       }
-"endbody"      { currentPosition += yyleng; return END_BODY;         }
-"integer"      { currentPosition += yyleng; return INTEGER;          }
-"array"        { currentPosition += yyleng; return ARRAY;            }
-"of"           { currentPosition += yyleng; return OF;               }
-"if"           { currentPosition += yyleng; return IF;               }
-"then"         { currentPosition += yyleng; return THEN;             }
-"endif"        { currentPosition += yyleng; return ENDIF;            }
-"else"         { currentPosition += yyleng; return ELSE;             }
-"while"        { currentPosition += yyleng; return WHILE;            }
-"do"           { currentPosition += yyleng; return DO;               }
-"beginloop"    { currentPosition += yyleng; return BEGINLOOP;        }
-"endloop"      { currentPosition += yyleng; return ENDLOOP;          }
-"continue"     { currentPosition += yyleng; return CONTINUE;         }
-"read"         { currentPosition += yyleng; return READ;             }
-"write"        { currentPosition += yyleng; return WRITE;            }
-"and"          { currentPosition += yyleng; return AND;              }
-"or"           { currentPosition += yyleng; return OR;               }
-"not"          { currentPosition += yyleng; return NOT;              }
-"true"         { currentPosition += yyleng; return TRUE;             }
-"false"        { currentPosition += yyleng; return FALSE;            }
-"return"       { currentPosition += yyleng; return RETURN;           }
 
-"-"            { currentPosition += yyleng; return SUB;              }
-"+"            { currentPosition += yyleng; return ADD;              }
-"*"            { currentPosition += yyleng; return MULT;             }
-"/"            { currentPosition += yyleng; return DIV;              }
-"%"            { currentPosition += yyleng; return MOD;              }
-
-"=="           { currentPosition += yyleng; return EQ;               }
-"<>"           { currentPosition += yyleng; return NEQ;              }
-"<"            { currentPosition += yyleng; return LT;               }
-">"            { currentPosition += yyleng; return GT;               }
-"<="           { currentPosition += yyleng; return LTE;              }
-">="           { currentPosition += yyleng; return GTE;              }
-
-";"            { currentPosition += yyleng; return SEMICOLON;        }
-":"            { currentPosition += yyleng; return COLON;            }
-","            { currentPosition += yyleng; return COMMA;            }
-"("            { currentPosition += yyleng; return L_PAREN;          }
-")"            { currentPosition += yyleng; return R_PAREN;          }
-"["            { currentPosition += yyleng; return L_SQUARE_BRACKET; }
-"]"            { currentPosition += yyleng; return R_SQUARE_BRACKET; }
-":="           { currentPosition += yyleng; return ASSIGN;           }
-{COMMENT}
-{IDENT_DIG}   printf("NUMBER %s\n",yytext);currentPosition += yyleng; 
-{IDENT_START_ERR} {printf("Error at line %d, column %d: Identifier \"%s\" must begin with a letter\n",currentLine,currentPosition,yytext);exit(0);}
-{IDENT_END_ERR} {printf("Error at line %d, column %d: Identifier \"%s\" cannot end with an underscore\n",currentLine,currentPosition,yytext);exit(0);}
-{IDENT_SYMBL_ERR} {printf("IDENT %s\n",yytext);currentPosition += yyleng; printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n", currentLine,currentPosition,yytext);exit(0);}
-.
-%%
- int main(int argc, char **argv)
-{
-yylex();
+/*main function for calling yylex()*/
+int main(int argc, char* argv[]){
+    if(argc == 2){
+	yyin = fopen(argv[1],"r");
+	yylex();
+	//fclose(yyin);
+    }
+    else {
+        yylex();
+    }
 }
