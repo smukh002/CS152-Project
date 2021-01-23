@@ -5,6 +5,13 @@ Example: write the flex specification in a file named mini_l.lex.
 Example: execute the command flex mini_l.lex. This will create a file called lex.yy.c in the current directory.
 3. Compile your MINI-L lexical analyzer. This will require the -lfl flag for gcc.
 Example: compile your lexical analyzer into the executable lexer with the following command: gcc -o lexer lex.yy.c -lfl. The program lexer should now be able to convert an inputted MINI-L program into the corresponding list of tokens.
+
+Format of.lex file:
+    definitions
+    %%
+    rules
+    %%
+    user code
 */
 
 
@@ -95,14 +102,13 @@ return		{printf("RETURN\n"); currentPosition += yyleng;}
 %%
 
 
-/*main function for calling yylex()*/
+/*main function calling yylex()*/
 int main(int argc, char* argv[]){
     if(argc == 2){
 	yyin = fopen(argv[1],"r");
-	yylex();
-	//fclose(yyin);
     }
     else {
-        yylex();
+        yyin = stdin;
     }
+    yylex();
 }
