@@ -6,3 +6,10 @@ parser: mini_l.lex mini_l.y
 clean:
 	 rm -f lex.yy.c y.tab.* y.output *.o parser
 
+trial:
+	chmod +x mil_run
+	cat fibonacci.min | ./my_compiler > fibonacci.mil
+	echo 5 > input.txt
+	./mil_run fibonacci.mil < input.txt
+
+
